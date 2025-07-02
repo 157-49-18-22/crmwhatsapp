@@ -253,6 +253,27 @@
             font-size: 1rem;
         }
 
+        .bulk-message {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .bulk-message textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .bulk-message button {
+            align-self: flex-start;
+            margin-top: 5px;
+        }
+
         .logs {
             height: 200px;
             overflow-y: auto;
@@ -389,7 +410,21 @@
                     💡 Tip: Just enter the phone number (e.g., 919354156323). The @c.us suffix will be added automatically.
                 </p>
                 
+                <h3 style="margin-top: 30px;">Send to Multiple Users</h3>
+                <div class="bulk-message">
+                    <textarea id="recipientsInput" placeholder="Enter phone numbers (one per line):&#10;919354156323&#10;919876543210&#10;919112233445" rows="4"></textarea>
+                    <textarea id="bulkMessageInput" placeholder="Enter your message to send to all recipients" rows="3"></textarea>
+                    <button onclick="sendBulkMessage()" class="btn btn-success">Send to All</button>
+                </div>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">
+                    💡 Tip: Enter one phone number per line. Each recipient will receive the same message.
+                </p>
+                
                 <h3 style="margin-top: 30px;">Recent Messages</h3>
+                <div style="margin-bottom: 10px;">
+                    <button onclick="refreshMessages()" class="btn" style="font-size: 0.9rem; padding: 8px 16px;">🔄 Refresh Messages</button>
+                    <span id="messageCount" style="margin-left: 10px; font-size: 0.9rem; color: #666;"></span>
+                </div>
                 <div class="messages-container" id="messagesContainer">
                     <p style="text-align: center; color: #666; margin-top: 50px;">
                         Select a client to view messages
@@ -478,6 +513,14 @@
                 updateSelectedClientInfo();
             }
             updateStats();
+        });
+
+        // Handle bulk message completion
+        socket.on('bulkMessageComplete', () => {
+            // Re-enable the send button
+            const sendButton = document.querySelector('.bulk-message button');
+            sendButton.disabled = false;
+            sendButton.textContent = 'Send to All';
         });
 
         function createClient() {
@@ -600,13 +643,16 @@
 
         function updateMessages() {
             const container = document.getElementById('messagesContainer');
+            const messageCount = document.getElementById('messageCount');
             
             if (!selectedClientId) {
                 container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">Select a client to view messages</p>';
+                messageCount.textContent = '';
                 return;
             }
             
             const messages = clientMessages.get(selectedClientId) || [];
+            messageCount.textContent = `${messages.length} messages`;
             
             if (messages.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">No messages for this client yet.</p>';
@@ -617,10 +663,14 @@
                 <div class="message ${message.type}">
                     <div class="message-header">
                         <strong>${message.from}</strong> • ${message.timestamp}
+                        ${message.type === 'received' ? '📥' : '📤'}
                     </div>
                     <div class="message-body">${message.body}</div>
                 </div>
             `).join('');
+            
+            // Scroll to bottom to show latest messages
+            container.scrollTop = container.scrollHeight;
         }
 
         function updateStats() {
@@ -658,6 +708,48 @@
                 message: message 
             });
             document.getElementById('messageInput').value = '';
+        }
+
+        function sendBulkMessage() {
+            if (!selectedClientId) {
+                addLog('Please select a client first', 'error');
+                return;
+            }
+            
+            const recipientsText = document.getElementById('recipientsInput').value.trim();
+            const message = document.getElementById('bulkMessageInput').value.trim();
+
+            if (!recipientsText) {
+                addLog('Please enter recipient phone numbers', 'error');
+                return;
+            }
+
+            if (!message) {
+                addLog('Please enter a message', 'error');
+                return;
+            }
+
+            // Parse recipients (one per line)
+            const recipients = recipientsText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+
+            if (recipients.length === 0) {
+                addLog('Please enter at least one valid phone number', 'error');
+                return;
+            }
+
+            // Disable the send button
+            const sendButton = document.querySelector('.bulk-message button');
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+
+            socket.emit('sendMessageToMultiple', { 
+                clientId: selectedClientId,
+                recipients: recipients, 
+                message: message 
+            });
+            document.getElementById('bulkMessageInput').value = '';
         }
 
         function restartSelectedClient() {
@@ -715,6 +807,15 @@
                 createClient();
             }
         });
+
+        function refreshMessages() {
+            if (!selectedClientId) {
+                addLog('Please select a client first', 'error');
+                return;
+            }
+            
+            socket.emit('refreshMessages', { clientId: selectedClientId });
+        }
     </script>
 </body>
 </html> 

@@ -142,7 +142,7 @@ function createClient(clientId) {
             return;
         }
         
-        console.log(`Message from ${message.from} to ${clientId}: ${message.body}`);
+        console.log(`📥 MESSAGE_CREATE from ${message.from} to ${clientId}: ${message.body}`);
         
         // Add message to our store
         const messageData = {
@@ -158,12 +158,19 @@ function createClient(clientId) {
         messages.push(messageData);
         clientMessages.set(clientId, messages);
         
+        console.log(`📊 Stored message for client ${clientId}. Total messages: ${messages.length}`);
+        
         // Emit to frontend
         io.emit('newMessage', messageData);
+        console.log(`📤 Emitted newMessage to frontend for client ${clientId}`);
         
         // Handle commands for this specific client
-        handleCommands(client, message, clientId);
+        handleCommands(client, message, clientId).catch(error => {
+            console.error(`Error handling commands for client ${clientId}:`, error);
+        });
     });
+
+
 
     console.log('Event handlers set up successfully for client:', clientId);
     console.log('=== CREATE CLIENT FUNCTION END ===');
@@ -172,7 +179,7 @@ function createClient(clientId) {
 }
 
 // Function to handle commands for a specific client
-function handleCommands(client, message, clientId) {
+async function handleCommands(client, message, clientId) {
     // Method 1: Direct reply to the message (recommended)
     if (message.body === '!ping') {
         message.reply('pong');
@@ -193,7 +200,15 @@ function handleCommands(client, message, clientId) {
 • !help - Show this help message
 • !time - Get current time
 • !info - Get message info
-• !client - Show which client you're using`;
+• !client - Show which client you're using
+• !bulk - Send message to multiple users (see format below)
+
+Bulk message format:
+!bulk
+RECIPIENT1
+RECIPIENT2
+---
+Your message here`;
         message.reply(helpText);
         addBotMessage(helpText, message.from, clientId);
     }
@@ -233,6 +248,93 @@ function handleCommands(client, message, clientId) {
     else if (message.body === '!client') {
         message.reply(`You are using client: ${clientId}`);
         addBotMessage(`You are using client: ${clientId}`, message.from, clientId);
+    }
+    
+    // Method 9: Bulk message command
+    else if (message.body.startsWith('!bulk ')) {
+        const parts = message.body.split('\n');
+        if (parts.length < 3) {
+            const helpText = `Bulk message format:
+!bulk
+RECIPIENT1
+RECIPIENT2
+---
+Your message here
+
+Example:
+!bulk
+919354156323
+919876543210
+---
+Hello everyone! This is a bulk message.`;
+            message.reply(helpText);
+            addBotMessage(helpText, message.from, clientId);
+            return;
+        }
+        
+        // Find the separator line (---)
+        const separatorIndex = parts.findIndex(part => part.trim() === '---');
+        if (separatorIndex === -1 || separatorIndex < 2) {
+            message.reply('Invalid format. Use "---" to separate recipients from message.');
+            addBotMessage('Invalid format. Use "---" to separate recipients from message.', message.from, clientId);
+            return;
+        }
+        
+        // Extract recipients and message
+        const recipients = parts.slice(1, separatorIndex).map(r => r.trim()).filter(r => r.length > 0);
+        const bulkMessage = parts.slice(separatorIndex + 1).join('\n').trim();
+        
+        if (recipients.length === 0) {
+            message.reply('No recipients found. Please provide at least one phone number.');
+            addBotMessage('No recipients found. Please provide at least one phone number.', message.from, clientId);
+            return;
+        }
+        
+        if (!bulkMessage) {
+            message.reply('No message found. Please provide a message after the "---" separator.');
+            addBotMessage('No message found. Please provide a message after the "---" separator.', message.from, clientId);
+            return;
+        }
+        
+        // Send confirmation
+        message.reply(`Starting to send bulk message to ${recipients.length} recipients...`);
+        addBotMessage(`Starting to send bulk message to ${recipients.length} recipients...`, message.from, clientId);
+        
+        // Send messages to each recipient
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const recipient of recipients) {
+            try {
+                // Format phone number properly
+                let formattedNumber = recipient;
+                formattedNumber = formattedNumber.replace(/[^\d@]/g, '');
+                
+                if (!formattedNumber.includes('@')) {
+                    formattedNumber = formattedNumber + '@c.us';
+                }
+                
+                if (!formattedNumber.match(/^\d+@c\.us$/)) {
+                    throw new Error(`Invalid phone number format: ${recipient}`);
+                }
+                
+                client.sendMessage(formattedNumber, bulkMessage);
+                addBotMessage(bulkMessage, formattedNumber, clientId);
+                successCount++;
+                
+            } catch (error) {
+                errorCount++;
+                console.error(`Error sending bulk message to ${recipient}:`, error);
+            }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        // Send completion summary
+        const summary = `Bulk message completed! Success: ${successCount}, Failed: ${errorCount}`;
+        message.reply(summary);
+        addBotMessage(summary, message.from, clientId);
     }
 }
 
@@ -370,6 +472,86 @@ io.on('connection', (socket) => {
             socket.emit('log', { type: 'error', message: 'Failed to send message: ' + error.message });
         }
     });
+
+    // Handle sending message to multiple users
+    socket.on('sendMessageToMultiple', async (data) => {
+        try {
+            const { clientId, recipients, message } = data;
+            
+            if (!clientId || !clients.has(clientId)) {
+                socket.emit('log', { type: 'error', message: 'Invalid client ID!' });
+                return;
+            }
+            
+            if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+                socket.emit('log', { type: 'error', message: 'Please provide at least one recipient!' });
+                return;
+            }
+            
+            if (!message || message.trim() === '') {
+                socket.emit('log', { type: 'error', message: 'Please provide a message!' });
+                return;
+            }
+            
+            const client = clients.get(clientId);
+            const status = clientStatus.get(clientId);
+            
+            if (status !== 'connected') {
+                socket.emit('log', { type: 'error', message: `Client ${clientId} is not connected!` });
+                return;
+            }
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            socket.emit('log', { type: 'info', message: `Starting to send message to ${recipients.length} recipients via ${clientId}...` });
+            
+            for (let i = 0; i < recipients.length; i++) {
+                const recipient = recipients[i].trim();
+                
+                try {
+                    // Format phone number properly
+                    let formattedNumber = recipient;
+                    
+                    // Remove any non-digit characters except @
+                    formattedNumber = formattedNumber.replace(/[^\d@]/g, '');
+                    
+                    // If no @c.us suffix, add it
+                    if (!formattedNumber.includes('@')) {
+                        formattedNumber = formattedNumber + '@c.us';
+                    }
+                    
+                    // Validate phone number format
+                    if (!formattedNumber.match(/^\d+@c\.us$/)) {
+                        throw new Error(`Invalid phone number format: ${recipient}`);
+                    }
+                    
+                    await client.sendMessage(formattedNumber, message);
+                    addBotMessage(message, formattedNumber, clientId);
+                    successCount++;
+                    
+                } catch (error) {
+                    errorCount++;
+                    console.error(`Error sending bulk message to ${recipient}:`, error);
+                }
+                
+                // Small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            // Final summary
+            const summary = `Bulk message completed! Success: ${successCount}, Failed: ${errorCount}`;
+            socket.emit('log', { type: successCount > 0 ? 'success' : 'warning', message: summary });
+            
+            // Re-enable the send button
+            socket.emit('bulkMessageComplete');
+            
+        } catch (error) {
+            console.error('Error sending bulk message:', error);
+            socket.emit('log', { type: 'error', message: 'Failed to send bulk message: ' + error.message });
+            socket.emit('bulkMessageComplete');
+        }
+    });
     
     // Handle bot restart
     socket.on('restartBot', (data) => {
@@ -411,6 +593,33 @@ io.on('connection', (socket) => {
             
         } catch (error) {
             socket.emit('log', { type: 'error', message: 'Failed to delete client: ' + error.message });
+        }
+    });
+    
+    // Handle bulk message completion
+    socket.on('bulkMessageComplete', () => {
+        // Re-enable the send button
+        const sendButton = document.querySelector('.bulk-message button');
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send to All';
+    });
+
+    // Handle message refresh request
+    socket.on('refreshMessages', (data) => {
+        try {
+            const { clientId } = data;
+            
+            if (!clientId || !clients.has(clientId)) {
+                socket.emit('log', { type: 'error', message: 'Invalid client ID!' });
+                return;
+            }
+            
+            const messages = clientMessages.get(clientId) || [];
+            socket.emit('messages', { clientId: clientId, messages: messages });
+            socket.emit('log', { type: 'info', message: `Refreshed ${messages.length} messages for client ${clientId}` });
+            
+        } catch (error) {
+            socket.emit('log', { type: 'error', message: 'Failed to refresh messages: ' + error.message });
         }
     });
     
