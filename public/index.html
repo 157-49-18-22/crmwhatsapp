@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Bot Dashboard</title>
+    <title>Multi-Client WhatsApp Bot Dashboard</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * {
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -42,46 +42,28 @@
             opacity: 0.9;
         }
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card {
+        .client-management {
             background: white;
             border-radius: 15px;
             padding: 25px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
         }
 
-        .status-card {
-            text-align: center;
+        .client-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .status-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        .status-disconnected { background-color: #ff4757; }
-        .status-qr_ready { background-color: #ffa502; }
-        .status-connected { background-color: #2ed573; }
-
-        .qr-container {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .qr-code {
-            max-width: 200px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .client-controls input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            min-width: 200px;
         }
 
         .btn {
@@ -105,6 +87,108 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff3742);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ed573, #1e90ff);
+        }
+
+        .clients-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .client-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .client-card.connected {
+            border-left-color: #2ed573;
+            background: #e8f5e8;
+        }
+
+        .client-card.qr_ready {
+            border-left-color: #ffa502;
+            background: #fff3cd;
+        }
+
+        .client-card.disconnected {
+            border-left-color: #ff4757;
+            background: #f8d7da;
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .client-id {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .client-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .status-connected { background-color: #2ed573; }
+        .status-qr_ready { background-color: #ffa502; }
+        .status-disconnected { background-color: #ff4757; }
+
+        .client-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .client-actions .btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-card {
+            text-align: center;
+        }
+
+        .qr-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .qr-code {
+            max-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .messages-container {
@@ -216,6 +300,13 @@
             margin-top: 5px;
         }
 
+        .no-client-selected {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+            font-size: 1.1rem;
+        }
+
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -224,37 +315,53 @@
             .header h1 {
                 font-size: 2rem;
             }
+
+            .client-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 WhatsApp Bot Dashboard</h1>
-            <p>Monitor and control your WhatsApp bot from the web</p>
+            <h1>🤖 Multi-Client WhatsApp Bot Dashboard</h1>
+            <p>Manage multiple WhatsApp bot instances from one dashboard</p>
+        </div>
+
+        <div class="client-management">
+            <h3>Client Management</h3>
+            <div class="client-controls">
+                <input type="text" id="newClientId" placeholder="Enter client ID (e.g., user1, bot2)" />
+                <button class="btn btn-success" onclick="createClient()">Create New Client</button>
+            </div>
+            
+            <div class="clients-list" id="clientsList">
+                <div class="no-client-selected">No clients created yet. Create your first client above!</div>
+            </div>
         </div>
 
         <div class="stats">
             <div class="stat-card">
+                <div class="stat-number" id="totalClients">0</div>
+                <div class="stat-label">Total Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="connectedClients">0</div>
+                <div class="stat-label">Connected</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-number" id="totalMessages">0</div>
                 <div class="stat-label">Total Messages</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="receivedMessages">0</div>
-                <div class="stat-label">Received</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="sentMessages">0</div>
-                <div class="stat-label">Sent</div>
             </div>
         </div>
 
         <div class="dashboard">
             <div class="card status-card">
-                <h3>Bot Status</h3>
-                <div style="margin: 20px 0;">
-                    <span class="status-indicator" id="statusIndicator"></span>
-                    <span id="statusText">Disconnected</span>
+                <h3>Selected Client Status</h3>
+                <div id="selectedClientInfo" class="no-client-selected">
+                    Select a client to view status
                 </div>
                 
                 <div class="qr-container" id="qrContainer" style="display: none;">
@@ -265,13 +372,9 @@
                     </p>
                 </div>
                 
-                <button class="btn" id="restartBtn" onclick="restartBot()">Restart Bot</button>
-                <div id="botNumberContainer" style="margin-top: 15px; display: none;">
-                    <p style="font-size: 0.9rem; color: #666;">Bot Number:</p>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-                        <input type="text" id="botNumber" readonly style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem;" />
-                        <button class="btn" onclick="copyBotNumber()" style="padding: 8px 12px; font-size: 0.8rem;">Copy</button>
-                    </div>
+                <div id="clientActions" style="display: none;">
+                    <button class="btn" id="restartBtn" onclick="restartSelectedClient()">Restart Client</button>
+                    <button class="btn btn-danger" onclick="deleteSelectedClient()">Delete Client</button>
                 </div>
             </div>
 
@@ -289,7 +392,7 @@
                 <h3 style="margin-top: 30px;">Recent Messages</h3>
                 <div class="messages-container" id="messagesContainer">
                     <p style="text-align: center; color: #666; margin-top: 50px;">
-                        No messages yet. Start a conversation to see messages here.
+                        Select a client to view messages
                     </p>
                 </div>
             </div>
@@ -298,20 +401,23 @@
         <div class="card">
             <h3>System Logs</h3>
             <div class="logs" id="logsContainer">
-                <div class="log-entry log-info">Dashboard loaded. Connecting to bot...</div>
+                <div class="log-entry log-info">Dashboard loaded. Ready to create clients...</div>
             </div>
         </div>
     </div>
 
     <script>
         const socket = io();
-        let messages = [];
-        let receivedCount = 0;
-        let sentCount = 0;
+        let clients = new Map();
+        let selectedClientId = null;
+        let clientMessages = new Map();
 
         // Connect to WebSocket
         socket.on('connect', () => {
+            console.log('=== FRONTEND: SOCKET CONNECTED ===');
+            console.log('Socket connected with ID:', socket.id);
             addLog('Connected to bot server', 'success');
+            console.log('=== FRONTEND: SOCKET CONNECTED END ===');
         });
 
         socket.on('disconnect', () => {
@@ -320,57 +426,190 @@
 
         // Handle bot status updates
         socket.on('botStatus', (data) => {
-            updateStatus(data.status, data.qrCode);
+            updateClientStatus(data.clientId, data.status, data.qrCode, data.botNumber);
         });
 
         // Handle new messages
         socket.on('newMessage', (message) => {
+            const messages = clientMessages.get(message.clientId) || [];
             messages.unshift(message);
-            updateMessages();
+            clientMessages.set(message.clientId, messages);
+            
+            if (message.clientId === selectedClientId) {
+                updateMessages();
+            }
             updateStats();
         });
 
         // Handle all messages on load
-        socket.on('messages', (allMessages) => {
-            messages = allMessages.reverse();
-            updateMessages();
+        socket.on('messages', (data) => {
+            const messages = (data.messages || []).reverse();
+            clientMessages.set(data.clientId, messages);
+            
+            if (data.clientId === selectedClientId) {
+                updateMessages();
+            }
             updateStats();
         });
 
         // Handle logs
         socket.on('log', (logData) => {
+            console.log('=== FRONTEND: LOG EVENT ===');
+            console.log('Log event received:', logData);
             addLog(logData.message, logData.type);
-            
-            // Extract bot number from logs
-            if (logData.message.includes('Bot number:')) {
-                const botNumber = logData.message.split('Bot number: ')[1];
-                document.getElementById('botNumber').value = botNumber;
-                document.getElementById('botNumberContainer').style.display = 'block';
-            }
+            console.log('=== FRONTEND: LOG EVENT END ===');
         });
 
-        function updateStatus(status, qrCode) {
-            const statusText = document.getElementById('statusText');
-            const statusIndicator = document.getElementById('statusIndicator');
+        // Handle client creation
+        socket.on('clientCreated', (data) => {
+            console.log('=== FRONTEND: CLIENT CREATED EVENT ===');
+            console.log('Client created event received:', data);
+            addClientToList(data.clientId);
+            updateStats();
+            addLog(`Client ${data.clientId} added to dashboard`, 'success');
+            console.log('=== FRONTEND: CLIENT CREATED EVENT END ===');
+        });
+
+        // Handle client deletion
+        socket.on('clientDeleted', (data) => {
+            removeClientFromList(data.clientId);
+            if (selectedClientId === data.clientId) {
+                selectedClientId = null;
+                updateSelectedClientInfo();
+            }
+            updateStats();
+        });
+
+        function createClient() {
+            console.log('=== FRONTEND: CREATE CLIENT START ===');
+            const clientId = document.getElementById('newClientId').value.trim();
+            console.log('Client ID from input:', clientId);
+            
+            if (!clientId) {
+                console.log('ERROR: Client ID is empty');
+                addLog('Please enter a client ID', 'error');
+                return;
+            }
+            
+            console.log('Emitting createClient event to server...');
+            addLog(`Creating client: ${clientId}...`, 'info');
+            socket.emit('createClient', { clientId: clientId });
+            document.getElementById('newClientId').value = '';
+            console.log('=== FRONTEND: CREATE CLIENT END ===');
+        }
+
+        function addClientToList(clientId) {
+            console.log('Adding client to list:', clientId);
+            const clientsList = document.getElementById('clientsList');
+            
+            // Remove "no clients" message if it exists
+            const noClientMsg = clientsList.querySelector('.no-client-selected');
+            if (noClientMsg) {
+                noClientMsg.remove();
+            }
+            
+            const clientCard = document.createElement('div');
+            clientCard.className = 'client-card disconnected';
+            clientCard.id = `client-${clientId}`;
+            clientCard.innerHTML = `
+                <div class="client-header">
+                    <div class="client-id">${clientId}</div>
+                    <div class="client-status status-disconnected">Disconnected</div>
+                </div>
+                <div class="client-actions">
+                    <button class="btn" onclick="selectClient('${clientId}')">Select</button>
+                    <button class="btn btn-danger" onclick="deleteClient('${clientId}')">Delete</button>
+                </div>
+            `;
+            
+            clientsList.appendChild(clientCard);
+            clients.set(clientId, { status: 'disconnected' });
+            console.log('Client added successfully:', clientId);
+        }
+
+        function removeClientFromList(clientId) {
+            const clientCard = document.getElementById(`client-${clientId}`);
+            if (clientCard) {
+                clientCard.remove();
+            }
+            clients.delete(clientId);
+            clientMessages.delete(clientId);
+            
+            // Show "no clients" message if no clients left
+            const clientsList = document.getElementById('clientsList');
+            if (clients.size === 0) {
+                clientsList.innerHTML = '<div class="no-client-selected">No clients created yet. Create your first client above!</div>';
+            }
+        }
+
+        function updateClientStatus(clientId, status, qrCode, botNumber) {
+            clients.set(clientId, { status: status, qrCode: qrCode, botNumber: botNumber });
+            
+            const clientCard = document.getElementById(`client-${clientId}`);
+            if (clientCard) {
+                clientCard.className = `client-card ${status}`;
+                const statusElement = clientCard.querySelector('.client-status');
+                statusElement.className = `client-status status-${status}`;
+                statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+            
+            if (clientId === selectedClientId) {
+                updateSelectedClientInfo();
+            }
+            updateStats();
+        }
+
+        function selectClient(clientId) {
+            selectedClientId = clientId;
+            updateSelectedClientInfo();
+            updateMessages();
+        }
+
+        function updateSelectedClientInfo() {
+            const infoDiv = document.getElementById('selectedClientInfo');
             const qrContainer = document.getElementById('qrContainer');
-            const qrCodeImg = document.getElementById('qrCode');
-
-            statusText.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            statusIndicator.className = 'status-indicator status-' + status;
-
-            if (status === 'qr_ready' && qrCode) {
+            const clientActions = document.getElementById('clientActions');
+            
+            if (!selectedClientId) {
+                infoDiv.innerHTML = '<div class="no-client-selected">Select a client to view status</div>';
+                qrContainer.style.display = 'none';
+                clientActions.style.display = 'none';
+                return;
+            }
+            
+            const client = clients.get(selectedClientId);
+            if (!client) return;
+            
+                         infoDiv.innerHTML = `
+                 <div style="margin: 20px 0;">
+                     <strong>Client ID:</strong> ${selectedClientId}<br>
+                     <strong>Status:</strong> ${client.status.charAt(0).toUpperCase() + client.status.slice(1)}<br>
+                     ${client.botNumber ? `<strong>Bot Number:</strong> ${client.botNumber}` : ''}
+                 </div>
+             `;
+            
+            if (client.status === 'qr_ready' && client.qrCode) {
                 qrContainer.style.display = 'block';
-                qrCodeImg.src = qrCode;
+                document.getElementById('qrCode').src = client.qrCode;
             } else {
                 qrContainer.style.display = 'none';
             }
+            
+            clientActions.style.display = 'block';
         }
 
         function updateMessages() {
             const container = document.getElementById('messagesContainer');
             
+            if (!selectedClientId) {
+                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">Select a client to view messages</p>';
+                return;
+            }
+            
+            const messages = clientMessages.get(selectedClientId) || [];
+            
             if (messages.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">No messages yet. Start a conversation to see messages here.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">No messages for this client yet.</p>';
                 return;
             }
 
@@ -385,15 +624,26 @@
         }
 
         function updateStats() {
-            receivedCount = messages.filter(m => m.type === 'received').length;
-            sentCount = messages.filter(m => m.type === 'sent').length;
+            let totalMessages = 0;
+            let connectedClients = 0;
             
-            document.getElementById('totalMessages').textContent = messages.length;
-            document.getElementById('receivedMessages').textContent = receivedCount;
-            document.getElementById('sentMessages').textContent = sentCount;
+            clients.forEach((client, clientId) => {
+                if (client.status === 'connected') connectedClients++;
+                const messages = clientMessages.get(clientId) || [];
+                totalMessages += messages.length;
+            });
+            
+            document.getElementById('totalClients').textContent = clients.size;
+            document.getElementById('connectedClients').textContent = connectedClients;
+            document.getElementById('totalMessages').textContent = totalMessages;
         }
 
         function sendMessage() {
+            if (!selectedClientId) {
+                addLog('Please select a client first', 'error');
+                return;
+            }
+            
             const recipient = document.getElementById('recipientInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
 
@@ -402,21 +652,38 @@
                 return;
             }
 
-            socket.emit('sendMessage', { to: recipient, message: message });
+            socket.emit('sendMessage', { 
+                clientId: selectedClientId,
+                to: recipient, 
+                message: message 
+            });
             document.getElementById('messageInput').value = '';
         }
 
-        function restartBot() {
-            socket.emit('restartBot');
+        function restartSelectedClient() {
+            if (!selectedClientId) {
+                addLog('Please select a client first', 'error');
+                return;
+            }
+            
+            socket.emit('restartBot', { clientId: selectedClientId });
         }
 
-        function copyBotNumber() {
-            const botNumber = document.getElementById('botNumber').value;
-            navigator.clipboard.writeText(botNumber).then(() => {
-                addLog('Bot number copied to clipboard!', 'success');
-            }).catch(() => {
-                addLog('Failed to copy bot number', 'error');
-            });
+        function deleteSelectedClient() {
+            if (!selectedClientId) {
+                addLog('Please select a client first', 'error');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete client "${selectedClientId}"?`)) {
+                socket.emit('deleteClient', { clientId: selectedClientId });
+            }
+        }
+
+        function deleteClient(clientId) {
+            if (confirm(`Are you sure you want to delete client "${clientId}"?`)) {
+                socket.emit('deleteClient', { clientId: clientId });
+            }
         }
 
         function addLog(message, type) {
@@ -439,6 +706,13 @@
         document.getElementById('recipientInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('messageInput').focus();
+            }
+        });
+
+        // Handle Enter key in new client ID input
+        document.getElementById('newClientId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                createClient();
             }
         });
     </script>
