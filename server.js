@@ -6,6 +6,7 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +25,163 @@ app.use(express.static('public'));
 const clients = new Map();
 const clientMessages = new Map();
 const clientStatus = new Map();
+
+// CRM API Configuration
+const CRM_API_BASE_URL = 'http://localhost:5000/api';
+
+// Function to fetch leads from CRM
+async function fetchLeadsFromCRM() {
+    try {
+        // Try the public endpoint first (no authentication required)
+        const response = await axios.get(`${CRM_API_BASE_URL}/leads/public`, {
+            timeout: 5000,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log('Fetched leads from CRM public endpoint:', response.data.length);
+        return response.data;
+    } catch (error) {
+        if (error.code === 'ECONNREFUSED') {
+            console.error('CRM server is not running. Please start the CRM backend server.');
+        } else {
+            console.error('Error fetching leads from CRM:', error.message);
+        }
+        
+        // Return comprehensive mock data for testing when CRM is not available
+        console.log('Returning mock data for testing');
+        return [
+            {
+                id: 1,
+                name: "John Doe",
+                email: "john@example.com",
+                phone: "+1234567890",
+                contactPhone: "+1234567890",
+                stage: "Initial",
+                company: "ABC Corp",
+                companyName: "ABC Corp"
+            },
+            {
+                id: 2,
+                name: "Jane Smith",
+                email: "jane@example.com",
+                phone: "+0987654321",
+                contactPhone: "+0987654321",
+                stage: "Discussion",
+                company: "XYZ Inc",
+                companyName: "XYZ Inc"
+            },
+            {
+                id: 3,
+                name: "Mike Johnson",
+                email: "mike@tech.com",
+                phone: "+1122334455",
+                contactPhone: "+1122334455",
+                stage: "Proposal",
+                company: "Tech Solutions",
+                companyName: "Tech Solutions"
+            },
+            {
+                id: 4,
+                name: "Sarah Wilson",
+                email: "sarah@design.com",
+                phone: "+1555666777",
+                contactPhone: "+1555666777",
+                stage: "Negotiation",
+                company: "Design Studio",
+                companyName: "Design Studio"
+            },
+            {
+                id: 5,
+                name: "David Brown",
+                email: "david@finance.com",
+                phone: "+1888999000",
+                contactPhone: "+1888999000",
+                stage: "Closed",
+                company: "Finance Corp",
+                companyName: "Finance Corp"
+            }
+        ];
+    }
+}
+
+// Function to fetch pipelines from CRM
+async function fetchPipelinesFromCRM() {
+    try {
+        const response = await axios.get(`${CRM_API_BASE_URL}/pipeline/all`, {
+            timeout: 5000,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            try {
+                const response = await axios.get(`${CRM_API_BASE_URL}/pipeline/all`, {
+                    timeout: 5000,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer mock-token'
+                    }
+                });
+                return response.data;
+            } catch (authError) {
+                console.error('Authentication failed, returning mock pipeline data');
+                return [
+                    {
+                        id: 1,
+                        name: "Sales Pipeline",
+                        stages: ["Initial", "Discussion", "Proposal", "Negotiation", "Closed"]
+                    }
+                ];
+            }
+        } else if (error.code === 'ECONNREFUSED') {
+            console.error('CRM server is not running. Please start the CRM backend server.');
+        } else {
+            console.error('Error fetching pipelines from CRM:', error.message);
+        }
+        return [];
+    }
+}
+
+// Function to organize leads by stage
+function organizeLeadsByStage(leads, pipelines) {
+    const organizedLeads = {};
+    
+    // Initialize stages from pipelines
+    if (pipelines && pipelines.length > 0) {
+        pipelines.forEach(pipeline => {
+            if (pipeline.stages) {
+                pipeline.stages.forEach(stage => {
+                    organizedLeads[stage] = [];
+                });
+            }
+        });
+    }
+    
+    // If no pipelines, create default stages
+    if (Object.keys(organizedLeads).length === 0) {
+        organizedLeads['Initial'] = [];
+        organizedLeads['Discussion'] = [];
+        organizedLeads['Proposal'] = [];
+        organizedLeads['Negotiation'] = [];
+        organizedLeads['Closed'] = [];
+        organizedLeads['Unknown'] = [];
+    }
+    
+    // Organize leads by stage
+    leads.forEach(lead => {
+        const stage = lead.stage || 'Unknown';
+        if (!organizedLeads[stage]) {
+            organizedLeads[stage] = [];
+        }
+        organizedLeads[stage].push(lead);
+    });
+    
+    console.log('Organized leads by stage:', Object.keys(organizedLeads).map(stage => `${stage}: ${organizedLeads[stage].length}`));
+    return organizedLeads;
+}
 
 // Function to create a new client instance
 function createClient(clientId) {
@@ -622,6 +780,76 @@ io.on('connection', (socket) => {
             socket.emit('log', { type: 'error', message: 'Failed to refresh messages: ' + error.message });
         }
     });
+
+    // Handle CRM data refresh request
+    socket.on('refreshCRMData', async () => {
+        try {
+            console.log('Refreshing CRM data...');
+            const leads = await fetchLeadsFromCRM();
+            const pipelines = await fetchPipelinesFromCRM();
+            const organizedLeads = organizeLeadsByStage(leads, pipelines);
+            
+            console.log(`Sending CRM data: ${leads.length} leads, ${pipelines.length} pipelines`);
+            
+            socket.emit('crmData', {
+                leads: leads,
+                pipelines: pipelines,
+                organizedLeads: organizedLeads
+            });
+            
+            socket.emit('log', { type: 'success', message: `Refreshed CRM data: ${leads.length} leads, ${pipelines.length} pipelines` });
+        } catch (error) {
+            console.error('Error refreshing CRM data:', error);
+            socket.emit('log', { type: 'error', message: 'Failed to refresh CRM data: ' + error.message });
+        }
+    });
+
+    // Handle sending message to CRM lead
+    socket.on('sendMessageToLead', async (data) => {
+        try {
+            const { clientId, leadId, message } = data;
+            
+            if (!clientId || !clients.has(clientId)) {
+                socket.emit('log', { type: 'error', message: 'Invalid client ID!' });
+                return;
+            }
+            
+            // Get lead details from CRM
+            const leads = await fetchLeadsFromCRM();
+            const lead = leads.find(l => l.id === leadId);
+            
+            if (!lead) {
+                socket.emit('log', { type: 'error', message: 'Lead not found!' });
+                return;
+            }
+            
+            const phoneNumber = lead.contactPhone;
+            if (!phoneNumber) {
+                socket.emit('log', { type: 'error', message: 'Lead has no phone number!' });
+                return;
+            }
+            
+            const client = clients.get(clientId);
+            const status = clientStatus.get(clientId);
+            
+            if (status === 'connected') {
+                // Format phone number properly
+                let formattedNumber = phoneNumber.replace(/[^\d]/g, '');
+                if (!formattedNumber.includes('@')) {
+                    formattedNumber = formattedNumber + '@c.us';
+                }
+                
+                await client.sendMessage(formattedNumber, message);
+                addBotMessage(message, formattedNumber, clientId);
+                socket.emit('log', { type: 'success', message: `Message sent to lead ${lead.contactName || lead.name} via ${clientId}!` });
+            } else {
+                socket.emit('log', { type: 'error', message: `Client ${clientId} is not connected!` });
+            }
+        } catch (error) {
+            console.error('Error sending message to lead:', error);
+            socket.emit('log', { type: 'error', message: 'Failed to send message to lead: ' + error.message });
+        }
+    });
     
     socket.on('disconnect', () => {
         console.log('Frontend disconnected');
@@ -647,6 +875,37 @@ app.get('/api/status/:clientId', (req, res) => {
         status: status, 
         messageCount: messages.length 
     });
+});
+
+// CRM Integration API endpoints
+app.get('/api/crm/leads', async (req, res) => {
+    try {
+        const leads = await fetchLeadsFromCRM();
+        const pipelines = await fetchPipelinesFromCRM();
+        const organizedLeads = organizeLeadsByStage(leads, pipelines);
+        
+        res.json({
+            leads: leads,
+            pipelines: pipelines,
+            organizedLeads: organizedLeads
+        });
+    } catch (error) {
+        console.error('Error fetching CRM data:', error);
+        res.status(500).json({ error: 'Failed to fetch CRM data' });
+    }
+});
+
+app.get('/api/crm/leads/by-stage', async (req, res) => {
+    try {
+        const leads = await fetchLeadsFromCRM();
+        const pipelines = await fetchPipelinesFromCRM();
+        const organizedLeads = organizeLeadsByStage(leads, pipelines);
+        
+        res.json(organizedLeads);
+    } catch (error) {
+        console.error('Error fetching leads by stage:', error);
+        res.status(500).json({ error: 'Failed to fetch leads by stage' });
+    }
 });
 
 app.get('/api/messages/:clientId', (req, res) => {

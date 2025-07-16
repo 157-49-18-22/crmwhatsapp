@@ -16,330 +16,386 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
+            padding: 20px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .client-management {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .client-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .client-controls input {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            font-size: 1rem;
-            min-width: 200px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #ff4757, #ff3742);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #2ed573, #1e90ff);
-        }
-
-        .clients-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .client-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            border-left: 4px solid #ddd;
-            transition: all 0.3s ease;
-        }
-
-        .client-card.connected {
-            border-left-color: #2ed573;
-            background: #e8f5e8;
-        }
-
-        .client-card.qr_ready {
-            border-left-color: #ffa502;
-            background: #fff3cd;
-        }
-
-        .client-card.disconnected {
-            border-left-color: #ff4757;
-            background: #f8d7da;
-        }
-
-        .client-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .client-id {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .client-status {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: white;
-        }
-
-        .status-connected { background-color: #2ed573; }
-        .status-qr_ready { background-color: #ffa502; }
-        .status-disconnected { background-color: #ff4757; }
-
-        .client-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .client-actions .btn {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            margin-bottom: 20px;
         }
 
         .card {
             background: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .status-card {
-            text-align: center;
-        }
-
-        .qr-container {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .qr-code {
-            max-width: 200px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .messages-container {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            background: #f8f9fa;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-
-        .message.received {
-            background: #e3f2fd;
-            margin-right: auto;
-            border-left: 4px solid #2196f3;
-        }
-
-        .message.sent {
-            background: #e8f5e8;
-            margin-left: auto;
-            border-right: 4px solid #4caf50;
-        }
-
-        .message-header {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .message-body {
-            word-wrap: break-word;
-        }
-
-        .send-message {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .send-message input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            font-size: 1rem;
-        }
-
-        .send-message button {
-            padding: 12px 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .bulk-message {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .bulk-message textarea {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-        }
-
-        .bulk-message button {
-            align-self: flex-start;
-            margin-top: 5px;
-        }
-
-        .logs {
-            height: 200px;
-            overflow-y: auto;
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
-
-        .log-entry {
-            margin-bottom: 5px;
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        .log-success { background: #d4edda; color: #155724; }
-        .log-error { background: #f8d7da; color: #721c24; }
-        .log-warning { background: #fff3cd; color: #856404; }
-        .log-info { background: #d1ecf1; color: #0c5460; }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
             margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: white;
+            border-radius: 15px;
             padding: 20px;
-            border-radius: 10px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.5em;
             font-weight: bold;
             color: #667eea;
+            margin-bottom: 5px;
         }
 
         .stat-label {
             color: #666;
-            margin-top: 5px;
+            font-size: 0.9em;
         }
 
-        .no-client-selected {
+        .client-section {
+            margin-bottom: 30px;
+        }
+
+        .client-input {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .client-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .client-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-purple {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background: #5a32a3;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .client-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .client-id {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .leads-section {
+            margin-bottom: 30px;
+        }
+
+        .leads-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .leads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .stage-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stage-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .lead-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .lead-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .lead-details {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .lead-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+
+        .message-section {
+            margin-bottom: 30px;
+        }
+
+        .message-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .tip {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+
+        .tip i {
+            margin-right: 5px;
+        }
+
+        .bulk-section {
+            margin-top: 30px;
+        }
+
+        .bulk-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .log-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-info {
+            color: #0c5460;
+        }
+
+        .log-success {
+            color: #155724;
+        }
+
+        .log-error {
+            color: #721c24;
+        }
+
+        .log-warning {
+            color: #856404;
+        }
+
+        .no-leads {
             text-align: center;
             color: #666;
-            margin-top: 50px;
-            font-size: 1.1rem;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn i {
+            font-size: 1.1em;
         }
 
         @media (max-width: 768px) {
-            .dashboard {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .clients-grid {
                 grid-template-columns: 1fr;
             }
             
-            .header h1 {
-                font-size: 2rem;
+            .leads-grid {
+                grid-template-columns: 1fr;
             }
-
-            .client-controls {
+            
+            .client-input {
                 flex-direction: column;
-                align-items: stretch;
             }
         }
     </style>
@@ -347,23 +403,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 Multi-Client WhatsApp Bot Dashboard</h1>
-            <p>Manage multiple WhatsApp bot instances from one dashboard</p>
+            <h1>Multi-Client WhatsApp Bot Dashboard</h1>
         </div>
 
-        <div class="client-management">
-            <h3>Client Management</h3>
-            <div class="client-controls">
-                <input type="text" id="newClientId" placeholder="Enter client ID (e.g., user1, bot2)" />
-                <button class="btn btn-success" onclick="createClient()">Create New Client</button>
-            </div>
-            
-            <div class="clients-list" id="clientsList">
-                <div class="no-client-selected">No clients created yet. Create your first client above!</div>
-            </div>
-        </div>
-
-        <div class="stats">
+        <!-- Statistics -->
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalClients">0</div>
                 <div class="stat-label">Total Clients</div>
@@ -376,316 +420,141 @@
                 <div class="stat-number" id="totalMessages">0</div>
                 <div class="stat-label">Total Messages</div>
             </div>
-        </div>
-
-        <div class="dashboard">
-            <div class="card status-card">
-                <h3>Selected Client Status</h3>
-                <div id="selectedClientInfo" class="no-client-selected">
-                    Select a client to view status
-                </div>
-                
-                <div class="qr-container" id="qrContainer" style="display: none;">
-                    <h4>Scan QR Code</h4>
-                    <img id="qrCode" class="qr-code" alt="QR Code">
-                    <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                        Open WhatsApp → Settings → Linked Devices → Link a Device
-                    </p>
-                </div>
-                
-                <div id="clientActions" style="display: none;">
-                    <button class="btn" id="restartBtn" onclick="restartSelectedClient()">Restart Client</button>
-                    <button class="btn btn-danger" onclick="deleteSelectedClient()">Delete Client</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Send Message</h3>
-                <div class="send-message">
-                    <input type="text" id="recipientInput" placeholder="Enter phone number (e.g., 919354156323)" />
-                    <input type="text" id="messageInput" placeholder="Enter your message" />
-                    <button onclick="sendMessage()">Send</button>
-                </div>
-                <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">
-                    💡 Tip: Just enter the phone number (e.g., 919354156323). The @c.us suffix will be added automatically.
-                </p>
-                
-                <h3 style="margin-top: 30px;">Send to Multiple Users</h3>
-                <div class="bulk-message">
-                    <textarea id="recipientsInput" placeholder="Enter phone numbers (one per line):&#10;919354156323&#10;919876543210&#10;919112233445" rows="4"></textarea>
-                    <textarea id="bulkMessageInput" placeholder="Enter your message to send to all recipients" rows="3"></textarea>
-                    <button onclick="sendBulkMessage()" class="btn btn-success">Send to All</button>
-                </div>
-                <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">
-                    💡 Tip: Enter one phone number per line. Each recipient will receive the same message.
-                </p>
-                
-                <h3 style="margin-top: 30px;">Recent Messages</h3>
-                <div style="margin-bottom: 10px;">
-                    <button onclick="refreshMessages()" class="btn" style="font-size: 0.9rem; padding: 8px 16px;">🔄 Refresh Messages</button>
-                    <span id="messageCount" style="margin-left: 10px; font-size: 0.9rem; color: #666;"></span>
-                </div>
-                <div class="messages-container" id="messagesContainer">
-                    <p style="text-align: center; color: #666; margin-top: 50px;">
-                        Select a client to view messages
-                    </p>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalLeads">0</div>
+                <div class="stat-label">CRM Leads</div>
             </div>
         </div>
 
+        <!-- Client Management -->
+        <div class="card client-section">
+            <h2>Client Management</h2>
+            <div class="client-input">
+                <input type="text" id="clientIdInput" placeholder="Enter client ID (e.g., user1, user2)">
+                <button class="btn btn-primary" onclick="createClient()">Create New Client</button>
+            </div>
+            <div id="clientsContainer" class="clients-grid"></div>
+        </div>
+
+        <!-- CRM Leads Section -->
+        <div class="card leads-section">
+            <div class="leads-header">
+                <h2>CRM Leads by Stage</h2>
+                <button class="btn btn-purple refresh-btn" onclick="refreshCRMData()">
+                    <i>🔄</i> Refresh
+                </button>
+            </div>
+            <div id="leadsContainer" class="leads-grid">
+                <div class="no-leads">No leads found in CRM. Make sure your CRM backend server is running on port 5000.</div>
+            </div>
+        </div>
+
+        <!-- Message Sending -->
+        <div class="card message-section">
+            <h2>Send Message</h2>
+            <div class="message-form">
+                <div class="form-group">
+                    <label for="phoneInput">Phone Number</label>
+                    <input type="text" id="phoneInput" placeholder="Enter phone number (e.g., 919354156323)">
+                    <div class="tip">
+                        <i>💡</i> Tip: Just enter the phone number (e.g., 919354156323). The @c.us suffix will be added automatically.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="messageInput">Message</label>
+                    <textarea id="messageInput" placeholder="Enter your message"></textarea>
+                </div>
+                <button class="btn btn-success" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Bulk Message Section -->
+        <div class="card bulk-section">
+            <h2>Send to Multiple Users</h2>
+            <div class="bulk-form">
+                <div class="form-group">
+                    <label for="bulkMessageInput">Message</label>
+                    <textarea id="bulkMessageInput" placeholder="Enter message to send to all connected clients"></textarea>
+                </div>
+                <button class="btn btn-warning" onclick="sendBulkMessage()">Send to All</button>
+            </div>
+        </div>
+
+        <!-- Logs -->
         <div class="card">
-            <h3>System Logs</h3>
-            <div class="logs" id="logsContainer">
-                <div class="log-entry log-info">Dashboard loaded. Ready to create clients...</div>
-            </div>
+            <h2>Activity Log</h2>
+            <div id="logContainer" class="log-section"></div>
         </div>
     </div>
 
     <script>
         const socket = io();
-        let clients = new Map();
         let selectedClientId = null;
-        let clientMessages = new Map();
 
-        // Connect to WebSocket
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            refreshCRMData();
+        });
+
+        // Socket event listeners
         socket.on('connect', () => {
-            console.log('=== FRONTEND: SOCKET CONNECTED ===');
-            console.log('Socket connected with ID:', socket.id);
-            addLog('Connected to bot server', 'success');
-            console.log('=== FRONTEND: SOCKET CONNECTED END ===');
+            addLog('Connected to server', 'info');
         });
 
         socket.on('disconnect', () => {
-            addLog('Disconnected from bot server', 'error');
+            addLog('Disconnected from server', 'error');
         });
 
-        // Handle bot status updates
-        socket.on('botStatus', (data) => {
-            updateClientStatus(data.clientId, data.status, data.qrCode, data.botNumber);
+        socket.on('qr', (data) => {
+            addLog(`QR Code received for client ${data.clientId}`, 'info');
         });
 
-        // Handle new messages
-        socket.on('newMessage', (message) => {
-            const messages = clientMessages.get(message.clientId) || [];
-            messages.unshift(message);
-            clientMessages.set(message.clientId, messages);
-            
-            if (message.clientId === selectedClientId) {
-                updateMessages();
-            }
+        socket.on('ready', (data) => {
+            addLog(`Client ${data.clientId} is ready!`, 'success');
             updateStats();
         });
 
-        // Handle all messages on load
-        socket.on('messages', (data) => {
-            const messages = (data.messages || []).reverse();
-            clientMessages.set(data.clientId, messages);
-            
-            if (data.clientId === selectedClientId) {
-                updateMessages();
-            }
+        socket.on('authenticated', (data) => {
+            addLog(`Client ${data.clientId} authenticated!`, 'success');
+        });
+
+        socket.on('auth_failure', (data) => {
+            addLog(`Authentication failed for client ${data.clientId}`, 'error');
+        });
+
+        socket.on('disconnected', (data) => {
+            addLog(`Client ${data.clientId} disconnected`, 'warning');
             updateStats();
         });
 
-        // Handle logs
-        socket.on('log', (logData) => {
-            console.log('=== FRONTEND: LOG EVENT ===');
-            console.log('Log event received:', logData);
-            addLog(logData.message, logData.type);
-            console.log('=== FRONTEND: LOG EVENT END ===');
+        socket.on('message', (data) => {
+            addLog(`New message from ${data.from}: ${data.body}`, 'info');
         });
 
-        // Handle client creation
-        socket.on('clientCreated', (data) => {
-            console.log('=== FRONTEND: CLIENT CREATED EVENT ===');
-            console.log('Client created event received:', data);
-            addClientToList(data.clientId);
-            updateStats();
-            addLog(`Client ${data.clientId} added to dashboard`, 'success');
-            console.log('=== FRONTEND: CLIENT CREATED EVENT END ===');
+        socket.on('log', (data) => {
+            addLog(data.message, data.type);
         });
 
-        // Handle client deletion
-        socket.on('clientDeleted', (data) => {
-            removeClientFromList(data.clientId);
-            if (selectedClientId === data.clientId) {
-                selectedClientId = null;
-                updateSelectedClientInfo();
-            }
-            updateStats();
+        socket.on('crmData', (data) => {
+            displayLeads(data.leads, data.pipelines, data.organizedLeads);
         });
 
-        // Handle bulk message completion
-        socket.on('bulkMessageComplete', () => {
-            // Re-enable the send button
-            const sendButton = document.querySelector('.bulk-message button');
-            sendButton.disabled = false;
-            sendButton.textContent = 'Send to All';
-        });
-
+        // Functions
         function createClient() {
-            console.log('=== FRONTEND: CREATE CLIENT START ===');
-            const clientId = document.getElementById('newClientId').value.trim();
-            console.log('Client ID from input:', clientId);
-            
+            const clientId = document.getElementById('clientIdInput').value.trim();
             if (!clientId) {
-                console.log('ERROR: Client ID is empty');
                 addLog('Please enter a client ID', 'error');
                 return;
             }
             
-            console.log('Emitting createClient event to server...');
-            addLog(`Creating client: ${clientId}...`, 'info');
             socket.emit('createClient', { clientId: clientId });
-            document.getElementById('newClientId').value = '';
-            console.log('=== FRONTEND: CREATE CLIENT END ===');
-        }
-
-        function addClientToList(clientId) {
-            console.log('Adding client to list:', clientId);
-            const clientsList = document.getElementById('clientsList');
-            
-            // Remove "no clients" message if it exists
-            const noClientMsg = clientsList.querySelector('.no-client-selected');
-            if (noClientMsg) {
-                noClientMsg.remove();
-            }
-            
-            const clientCard = document.createElement('div');
-            clientCard.className = 'client-card disconnected';
-            clientCard.id = `client-${clientId}`;
-            clientCard.innerHTML = `
-                <div class="client-header">
-                    <div class="client-id">${clientId}</div>
-                    <div class="client-status status-disconnected">Disconnected</div>
-                </div>
-                <div class="client-actions">
-                    <button class="btn" onclick="selectClient('${clientId}')">Select</button>
-                    <button class="btn btn-danger" onclick="deleteClient('${clientId}')">Delete</button>
-                </div>
-            `;
-            
-            clientsList.appendChild(clientCard);
-            clients.set(clientId, { status: 'disconnected' });
-            console.log('Client added successfully:', clientId);
-        }
-
-        function removeClientFromList(clientId) {
-            const clientCard = document.getElementById(`client-${clientId}`);
-            if (clientCard) {
-                clientCard.remove();
-            }
-            clients.delete(clientId);
-            clientMessages.delete(clientId);
-            
-            // Show "no clients" message if no clients left
-            const clientsList = document.getElementById('clientsList');
-            if (clients.size === 0) {
-                clientsList.innerHTML = '<div class="no-client-selected">No clients created yet. Create your first client above!</div>';
-            }
-        }
-
-        function updateClientStatus(clientId, status, qrCode, botNumber) {
-            clients.set(clientId, { status: status, qrCode: qrCode, botNumber: botNumber });
-            
-            const clientCard = document.getElementById(`client-${clientId}`);
-            if (clientCard) {
-                clientCard.className = `client-card ${status}`;
-                const statusElement = clientCard.querySelector('.client-status');
-                statusElement.className = `client-status status-${status}`;
-                statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            }
-            
-            if (clientId === selectedClientId) {
-                updateSelectedClientInfo();
-            }
-            updateStats();
+            document.getElementById('clientIdInput').value = '';
         }
 
         function selectClient(clientId) {
             selectedClientId = clientId;
-            updateSelectedClientInfo();
-            updateMessages();
-        }
-
-        function updateSelectedClientInfo() {
-            const infoDiv = document.getElementById('selectedClientInfo');
-            const qrContainer = document.getElementById('qrContainer');
-            const clientActions = document.getElementById('clientActions');
-            
-            if (!selectedClientId) {
-                infoDiv.innerHTML = '<div class="no-client-selected">Select a client to view status</div>';
-                qrContainer.style.display = 'none';
-                clientActions.style.display = 'none';
-                return;
-            }
-            
-            const client = clients.get(selectedClientId);
-            if (!client) return;
-            
-                         infoDiv.innerHTML = `
-                 <div style="margin: 20px 0;">
-                     <strong>Client ID:</strong> ${selectedClientId}<br>
-                     <strong>Status:</strong> ${client.status.charAt(0).toUpperCase() + client.status.slice(1)}<br>
-                     ${client.botNumber ? `<strong>Bot Number:</strong> ${client.botNumber}` : ''}
-                 </div>
-             `;
-            
-            if (client.status === 'qr_ready' && client.qrCode) {
-                qrContainer.style.display = 'block';
-                document.getElementById('qrCode').src = client.qrCode;
-            } else {
-                qrContainer.style.display = 'none';
-            }
-            
-            clientActions.style.display = 'block';
-        }
-
-        function updateMessages() {
-            const container = document.getElementById('messagesContainer');
-            const messageCount = document.getElementById('messageCount');
-            
-            if (!selectedClientId) {
-                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">Select a client to view messages</p>';
-                messageCount.textContent = '';
-                return;
-            }
-            
-            const messages = clientMessages.get(selectedClientId) || [];
-            messageCount.textContent = `${messages.length} messages`;
-            
-            if (messages.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">No messages for this client yet.</p>';
-                return;
-            }
-
-            container.innerHTML = messages.map(message => `
-                <div class="message ${message.type}">
-                    <div class="message-header">
-                        <strong>${message.from}</strong> • ${message.timestamp}
-                        ${message.type === 'received' ? '📥' : '📤'}
-                    </div>
-                    <div class="message-body">${message.body}</div>
-                </div>
-            `).join('');
-            
-            // Scroll to bottom to show latest messages
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function updateStats() {
-            let totalMessages = 0;
-            let connectedClients = 0;
-            
-            clients.forEach((client, clientId) => {
-                if (client.status === 'connected') connectedClients++;
-                const messages = clientMessages.get(clientId) || [];
-                totalMessages += messages.length;
-            });
-            
-            document.getElementById('totalClients').textContent = clients.size;
-            document.getElementById('connectedClients').textContent = connectedClients;
-            document.getElementById('totalMessages').textContent = totalMessages;
+            addLog(`Selected client: ${clientId}`, 'info');
         }
 
         function sendMessage() {
@@ -693,129 +562,178 @@
                 addLog('Please select a client first', 'error');
                 return;
             }
-            
-            const recipient = document.getElementById('recipientInput').value.trim();
+
+            const phone = document.getElementById('phoneInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
 
-            if (!recipient || !message) {
-                addLog('Please enter both recipient and message', 'error');
+            if (!phone || !message) {
+                addLog('Please enter both phone number and message', 'error');
                 return;
             }
 
-            socket.emit('sendMessage', { 
+            socket.emit('sendMessage', {
                 clientId: selectedClientId,
-                to: recipient, 
-                message: message 
+                phone: phone,
+                message: message
             });
+
+            document.getElementById('phoneInput').value = '';
             document.getElementById('messageInput').value = '';
         }
 
         function sendBulkMessage() {
-            if (!selectedClientId) {
-                addLog('Please select a client first', 'error');
-                return;
-            }
-            
-            const recipientsText = document.getElementById('recipientsInput').value.trim();
             const message = document.getElementById('bulkMessageInput').value.trim();
-
-            if (!recipientsText) {
-                addLog('Please enter recipient phone numbers', 'error');
-                return;
-            }
-
             if (!message) {
                 addLog('Please enter a message', 'error');
                 return;
             }
 
-            // Parse recipients (one per line)
-            const recipients = recipientsText.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
-
-            if (recipients.length === 0) {
-                addLog('Please enter at least one valid phone number', 'error');
-                return;
-            }
-
-            // Disable the send button
-            const sendButton = document.querySelector('.bulk-message button');
-            sendButton.disabled = true;
-            sendButton.textContent = 'Sending...';
-
-            socket.emit('sendMessageToMultiple', { 
-                clientId: selectedClientId,
-                recipients: recipients, 
-                message: message 
-            });
+            socket.emit('sendBulkMessage', { message: message });
             document.getElementById('bulkMessageInput').value = '';
         }
 
-        function restartSelectedClient() {
-            if (!selectedClientId) {
-                addLog('Please select a client first', 'error');
-                return;
-            }
-            
-            socket.emit('restartBot', { clientId: selectedClientId });
+        function refreshCRMData() {
+            socket.emit('refreshCRMData');
+            addLog('Refreshing CRM data...', 'info');
         }
 
-        function deleteSelectedClient() {
+        function displayLeads(leads, pipelines, organizedLeads) {
+            const container = document.getElementById('leadsContainer');
+            
+            if (!leads || leads.length === 0) {
+                container.innerHTML = '<div class="no-leads">No leads found in CRM. Make sure your CRM backend server is running on port 5000.</div>';
+                document.getElementById('totalLeads').textContent = '0';
+                return;
+            }
+
+            let html = '';
+            
+            // Display leads organized by stage
+            for (const [stage, stageLeads] of Object.entries(organizedLeads)) {
+                html += `
+                    <div class="stage-card">
+                        <div class="stage-title">${stage} (${stageLeads.length})</div>
+                        ${stageLeads.map(lead => `
+                            <div class="lead-item">
+                                <div class="lead-name">${lead.name || lead.contactName || 'Unknown'}</div>
+                                <div class="lead-details">
+                                    ${lead.email ? `📧 ${lead.email}<br>` : ''}
+                                    ${lead.phone ? `📞 ${lead.phone}<br>` : ''}
+                                    ${lead.contactPhone ? `📞 ${lead.contactPhone}<br>` : ''}
+                                    ${lead.company ? `🏢 ${lead.company}<br>` : ''}
+                                    ${lead.stage ? `📊 Stage: ${lead.stage}` : ''}
+                                </div>
+                                <div class="lead-actions">
+                                    <button class="btn btn-small btn-success" onclick="sendMessageToLead(${lead.id})">
+                                        💬 Send Message
+                                    </button>
+                                    <button class="btn btn-small btn-primary" onclick="viewLeadDetails(${lead.id})">
+                                        👁️ View Details
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            document.getElementById('totalLeads').textContent = leads.length;
+        }
+
+        function sendMessageToLead(leadId) {
             if (!selectedClientId) {
                 addLog('Please select a client first', 'error');
                 return;
             }
-            
-            if (confirm(`Are you sure you want to delete client "${selectedClientId}"?`)) {
-                socket.emit('deleteClient', { clientId: selectedClientId });
+
+            const message = prompt('Enter message to send to this lead:');
+            if (message) {
+                socket.emit('sendMessageToLead', {
+                    clientId: selectedClientId,
+                    leadId: leadId,
+                    message: message
+                });
             }
+        }
+
+        function viewLeadDetails(leadId) {
+            addLog(`Viewing details for lead ID: ${leadId}`, 'info');
+            // You can implement a modal or detailed view here
+        }
+
+        function updateStats() {
+            fetch('/api/clients')
+                .then(response => response.json())
+                .then(clients => {
+                    const connected = clients.filter(c => c.status === 'connected').length;
+                    const totalMessages = clients.reduce((sum, c) => sum + c.messageCount, 0);
+                    
+                    document.getElementById('totalClients').textContent = clients.length;
+                    document.getElementById('connectedClients').textContent = connected;
+                    document.getElementById('totalMessages').textContent = totalMessages;
+                    
+                    displayClients(clients);
+                })
+                .catch(error => {
+                    console.error('Error fetching clients:', error);
+                });
+        }
+
+        function displayClients(clients) {
+            const container = document.getElementById('clientsContainer');
+            
+            if (clients.length === 0) {
+                container.innerHTML = '<div class="no-leads">No clients created yet. Create your first client above!</div>';
+                return;
+            }
+
+            const html = clients.map(client => `
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-id">${client.clientId}</div>
+                        <span class="status-badge status-${client.status}">${client.status}</span>
+                    </div>
+                    <div>Messages: ${client.messageCount}</div>
+                    <div class="client-actions">
+                        <button class="btn btn-small btn-primary" onclick="selectClient('${client.clientId}')">
+                            Select
+                        </button>
+                        <button class="btn btn-small btn-warning" onclick="restartClient('${client.clientId}')">
+                            Restart
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteClient('${client.clientId}')">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function restartClient(clientId) {
+            socket.emit('restartClient', { clientId: clientId });
         }
 
         function deleteClient(clientId) {
-            if (confirm(`Are you sure you want to delete client "${clientId}"?`)) {
+            if (confirm(`Are you sure you want to delete client ${clientId}?`)) {
                 socket.emit('deleteClient', { clientId: clientId });
             }
         }
 
-        function addLog(message, type) {
-            const container = document.getElementById('logsContainer');
+        function addLog(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
             logEntry.className = `log-entry log-${type}`;
-            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
             container.appendChild(logEntry);
             container.scrollTop = container.scrollHeight;
         }
 
-        // Handle Enter key in message input
-        document.getElementById('messageInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Handle Enter key in recipient input
-        document.getElementById('recipientInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('messageInput').focus();
-            }
-        });
-
-        // Handle Enter key in new client ID input
-        document.getElementById('newClientId').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                createClient();
-            }
-        });
-
-        function refreshMessages() {
-            if (!selectedClientId) {
-                addLog('Please select a client first', 'error');
-                return;
-            }
-            
-            socket.emit('refreshMessages', { clientId: selectedClientId });
-        }
+        // Auto-refresh stats every 5 seconds
+        setInterval(updateStats, 5000);
     </script>
 </body>
 </html> 
