@@ -97,7 +97,7 @@ async function fetchLeadsFromCRM() {
                 email: "david@finance.com",
                 phone: "+1888999000",
                 contactPhone: "+1888999000",
-                stage: "Closed",
+                stage: "Deal Won",
                 company: "Finance Corp",
                 companyName: "Finance Corp"
             }
@@ -132,7 +132,7 @@ async function fetchPipelinesFromCRM() {
                     {
                         id: 1,
                         name: "Sales Pipeline",
-                        stages: ["Initial", "Discussion", "Proposal", "Negotiation", "Closed"]
+                        stages: ["Initial", "Discussion", "Proposal", "Negotiation", "Deal Won", "Deal Lost"]
                     }
                 ];
             }
@@ -166,7 +166,8 @@ function organizeLeadsByStage(leads, pipelines) {
         organizedLeads['Discussion'] = [];
         organizedLeads['Proposal'] = [];
         organizedLeads['Negotiation'] = [];
-        organizedLeads['Closed'] = [];
+        organizedLeads['Deal Won'] = [];
+        organizedLeads['Deal Lost'] = [];
         organizedLeads['Unknown'] = [];
     }
     
@@ -592,6 +593,7 @@ io.on('connection', (socket) => {
     // Handle manual message sending
     socket.on('sendMessage', async (data) => {
         try {
+            console.log('Received sendMessage data:', data);
             const { clientId, to, message } = data;
             
             if (!clientId || !clients.has(clientId)) {
@@ -603,6 +605,16 @@ io.on('connection', (socket) => {
             const status = clientStatus.get(clientId);
             
             if (status === 'connected') {
+                console.log('Client status is connected, processing message...');
+                console.log('Phone number (to):', to);
+                console.log('Message:', message);
+                
+                // Validate phone number
+                if (!to || typeof to !== 'string') {
+                    console.log('Phone number validation failed:', { to, type: typeof to });
+                    throw new Error('Invalid phone number provided');
+                }
+                
                 // Format phone number properly
                 let formattedNumber = to;
                 
@@ -668,6 +680,11 @@ io.on('connection', (socket) => {
                 const recipient = recipients[i].trim();
                 
                 try {
+                    // Validate recipient
+                    if (!recipient || typeof recipient !== 'string') {
+                        throw new Error('Invalid recipient provided');
+                    }
+                    
                     // Format phone number properly
                     let formattedNumber = recipient;
                     
