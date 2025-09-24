@@ -57,7 +57,7 @@ async function fetchLeadsFromCRM() {
                 email: "john@example.com",
                 phone: "+1234567890",
                 contactPhone: "+1234567890",
-                stage: "Initial",
+                stage: "CONTACTED",
                 company: "ABC Corp",
                 companyName: "ABC Corp"
             },
@@ -67,7 +67,7 @@ async function fetchLeadsFromCRM() {
                 email: "jane@example.com",
                 phone: "+0987654321",
                 contactPhone: "+0987654321",
-                stage: "Discussion",
+                stage: "REQUEST PROCESSED",
                 company: "XYZ Inc",
                 companyName: "XYZ Inc"
             },
@@ -77,7 +77,7 @@ async function fetchLeadsFromCRM() {
                 email: "mike@tech.com",
                 phone: "+1122334455",
                 contactPhone: "+1122334455",
-                stage: "Proposal",
+                stage: "SERVICE BOOKED",
                 company: "Tech Solutions",
                 companyName: "Tech Solutions"
             },
@@ -87,7 +87,7 @@ async function fetchLeadsFromCRM() {
                 email: "sarah@design.com",
                 phone: "+1555666777",
                 contactPhone: "+1555666777",
-                stage: "Negotiation",
+                stage: "SPECIALIST ASSIGNED",
                 company: "Design Studio",
                 companyName: "Design Studio"
             },
@@ -97,7 +97,7 @@ async function fetchLeadsFromCRM() {
                 email: "david@finance.com",
                 phone: "+1888999000",
                 contactPhone: "+1888999000",
-                stage: "Deal Won",
+                stage: "DEAL - WON",
                 company: "Finance Corp",
                 companyName: "Finance Corp"
             }
@@ -114,7 +114,7 @@ async function fetchPipelinesFromCRM() {
                 'Content-Type': 'application/json'
             }
         });
-        return response.data;
+        return response.data.pipelines || response.data;
     } catch (error) {
         if (error.response && error.response.status === 401) {
             try {
@@ -125,14 +125,21 @@ async function fetchPipelinesFromCRM() {
                         'Authorization': 'Bearer mock-token'
                     }
                 });
-                return response.data;
+                return response.data.pipelines || response.data;
             } catch (authError) {
                 console.error('Authentication failed, returning mock pipeline data');
                 return [
                     {
                         id: 1,
                         name: "Sales Pipeline",
-                        stages: ["Initial", "Discussion", "Proposal", "Negotiation", "Deal Won", "Deal Lost"]
+                        stages: [
+                            { label: "Initial Contact" },
+                            { label: "Discussions" },
+                            { label: "Decision Making" },
+                            { label: "Contract Discussion" },
+                            { label: "Deal - won" },
+                            { label: "Deal - lost" }
+                        ]
                     }
                 ];
             }
@@ -149,35 +156,40 @@ async function fetchPipelinesFromCRM() {
 function organizeLeadsByStage(leads, pipelines) {
     const organizedLeads = {};
     
-    // Initialize stages from pipelines
+    // Get stages from the current pipeline
+    let allowedStages = [];
+    
     if (pipelines && pipelines.length > 0) {
-        pipelines.forEach(pipeline => {
-            if (pipeline.stages) {
-                pipeline.stages.forEach(stage => {
-                    organizedLeads[stage] = [];
-                });
-            }
-        });
+        // Use the first pipeline (or you can implement logic to get the selected pipeline)
+        const currentPipeline = pipelines[0];
+        if (currentPipeline.stages && currentPipeline.stages.length > 0) {
+            allowedStages = currentPipeline.stages.map(stage => stage.label || stage.name);
+        }
     }
     
-    // If no pipelines, create default stages
-    if (Object.keys(organizedLeads).length === 0) {
-        organizedLeads['Initial'] = [];
-        organizedLeads['Discussion'] = [];
-        organizedLeads['Proposal'] = [];
-        organizedLeads['Negotiation'] = [];
-        organizedLeads['Deal Won'] = [];
-        organizedLeads['Deal Lost'] = [];
-        organizedLeads['Unknown'] = [];
+    // If no stages found, use default stages
+    if (allowedStages.length === 0) {
+        allowedStages = [
+            'Initial Contact',
+            'Discussions', 
+            'Decision Making',
+            'Contract Discussion',
+            'Deal - won',
+            'Deal - lost'
+        ];
     }
     
-    // Organize leads by stage
+    // Initialize only the allowed stages
+    allowedStages.forEach(stage => {
+        organizedLeads[stage] = [];
+    });
+    
+    // Organize leads by stage (only for allowed stages)
     leads.forEach(lead => {
         const stage = lead.stage || 'Unknown';
-        if (!organizedLeads[stage]) {
-            organizedLeads[stage] = [];
+        if (allowedStages.includes(stage)) {
+            organizedLeads[stage].push(lead);
         }
-        organizedLeads[stage].push(lead);
     });
     
     console.log('Organized leads by stage:', Object.keys(organizedLeads).map(stage => `${stage}: ${organizedLeads[stage].length}`));
