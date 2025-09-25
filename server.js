@@ -943,6 +943,26 @@ app.get('/api/messages/:clientId', (req, res) => {
     res.json(messages);
 });
 
+// WhatsApp QR Code API
+app.get('/api/whatsapp/qr', (req, res) => {
+    // Get the first connected client's QR code
+    const connectedClient = Array.from(clients.keys()).find(clientId => 
+        clientStatus.get(clientId) === 'qr_ready'
+    );
+    
+    if (connectedClient) {
+        // This would need to be stored when QR is generated
+        res.json({ qrCode: null, message: 'QR code available for client: ' + connectedClient });
+    } else {
+        res.json({ qrCode: null, message: 'No QR code available. Please create a client first.' });
+    }
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK', whatsapp: 'running' });
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
