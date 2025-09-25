@@ -1,5 +1,9 @@
+const express = require('express');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Create a new client instance with LocalAuth for session persistence
 const client = new Client({
@@ -9,14 +13,18 @@ const client = new Client({
     }
 });
 
+let qrCodeData = null;
+
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-    console.log('Client is ready!');
+    console.log('WhatsApp client is ready!');
 });
 
 // When the client received QR-Code
-client.on('qr', qr => {
-    qrcode.generate(qr, {small: true});
+client.on('qr', async (qr) => {
+    console.log('QR Code generated');
+    qrCodeData = await QRCode.toDataURL(qr);
+    // Don't print QR code to console in production
 });
 
 // Listening to all incoming messages
@@ -76,5 +84,23 @@ client.on('message_create', message => {
     }
 });
 
-// Start your client
+// Express routes
+app.get('/api/whatsapp/qr', (req, res) => {
+    if (qrCodeData) {
+        res.json({ qrCode: qrCodeData });
+    } else {
+        res.json({ qrCode: null, message: 'QR code not ready yet' });
+    }
+});
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK', whatsapp: 'connected' });
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`WhatsApp Bot Server running on port ${PORT}`);
+});
+
+// Initialize WhatsApp client
 client.initialize(); 
